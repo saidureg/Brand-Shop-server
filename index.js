@@ -25,6 +25,7 @@ async function run() {
     await client.connect();
 
     const productsCollection = client.db("brandShopDB").collection("products");
+    const brandsCollection = client.db("brandShopDB").collection("brands");
 
     app.get("/products", async (req, res) => {
       const result = await productsCollection.find().toArray();
@@ -38,7 +39,12 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/brandName/:brandName", async (req, res) => {
+    app.get("/brands", async (req, res) => {
+      const result = await brandsCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/brands/:brandName", async (req, res) => {
       const brandName = req.params.brandName;
       const query = { brandName: { $regex: new RegExp(brandName, "i") } };
       const result = await productsCollection.find(query).toArray();
