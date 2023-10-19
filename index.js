@@ -27,18 +27,6 @@ async function run() {
     const productsCollection = client.db("brandShopDB").collection("products");
     const brandsCollection = client.db("brandShopDB").collection("brands");
 
-    app.get("/products", async (req, res) => {
-      const result = await productsCollection.find().toArray();
-      res.send(result);
-    });
-
-    app.get("/products/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await productsCollection.findOne(query);
-      res.send(result);
-    });
-
     app.get("/brands", async (req, res) => {
       const result = await brandsCollection.find().toArray();
       res.send(result);
@@ -51,9 +39,44 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/products", async (req, res) => {
+      const result = await productsCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productsCollection.findOne(query);
+      res.send(result);
+    });
+
     app.post("/products", async (req, res) => {
       const newProduct = req.body;
       const result = await productsCollection.insertOne(newProduct);
+      res.send(result);
+    });
+
+    app.put("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedProduct = req.body;
+      const filter = { _id: new ObjectId(id) };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: {
+          name: updatedProduct.name,
+          brandName: updatedProduct.brandName,
+          price: updatedProduct.price,
+          rating: updatedProduct.rating,
+          photo: updatedProduct.photo,
+          type: updatedProduct.type,
+        },
+      };
+      const result = await productsCollection.updateOne(
+        filter,
+        updateDoc,
+        options
+      );
       res.send(result);
     });
 
